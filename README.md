@@ -5,8 +5,17 @@ GridX is an interactive, educational coding game designed to teach the fundament
 ---
 
 ## 🚀 Live Demo
-**[GridX Live](https://gridx811.vercel.app)** 
-*(Note: Replace with your actual deployment link if different)*
+**[GridX Live](https://gridx811.vercel.app)**
+
+---
+
+## 🖼️ Preview
+
+### Main Interface
+![GridX Main Preview](./preview-1.png)
+
+### Commands Page
+![GridX Commands Preview](./preview-2.png)
 
 ---
 
@@ -21,41 +30,20 @@ GridX is an interactive, educational coding game designed to teach the fundament
 
 ## 🛠️ Technology Stack
 
-- **Frontend:** Vanilla JavaScript (ES6+), HTML5, CSS3.
-- **Code Editor:** [CodeMirror 5](https://codemirror.net/) for syntax highlighting and auto-completion.
-- **Typography:** Outfit & Fira Code (via Google Fonts).
-- **Icons:** SVG-based custom illustrations.
+- **Frontend:** Vanilla JavaScript (ES6+), HTML5, CSS3
+- **Code Editor:** CodeMirror 5
+- **Typography:** Outfit & Fira Code
+- **Icons:** SVG-based custom illustrations
 
 ## 🕹️ Quick Start: Basic Commands
 
-To get started, try entering these commands in the terminal:
-
 ```javascript
-// Basic Move
 player.move('right');
-
-// Fast Movement
 player.run('down');
 
-// Intelligent Looping
 repeat(5) {
   player.move('r');
   if (canMove('d')) {
     player.move('d');
   }
 }
-```
-
-## 📂 Project Structure
-
-- `index.html`: The main dashboard and game grid.
-- `commands.html`: The interactive documentation.
-- `styles/`: Custom CSS architecture (style, commands, about).
-- `scripts/`: Modular JS engine (player API, execution engine, UI handler).
-
-## 📖 License
-
-This project was created with ❤️ by [Yasser811](https://github.com/yasser8111).
-
----
-© 2026 GridX
