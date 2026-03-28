@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GridX - Code Your Way</title>
+    <meta
+      name="description"
+      content="An interactive coding game where you control your character with code."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=IBM+Plex+Sans+Arabic:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- CodeMirror Styles -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css"
+    />
+    <link rel="stylesheet" href="./styles/style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="glass shared-header">
+        <button class="menu-toggle" id="menu-toggle">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </button>
+        <div class="header-controls" id="nav-links">
+          <a href="commands.html" class="nav-link">Commands</a>
+          <a href="about.html" class="nav-link">About</a>
+        </div>
+        <div class="logo">
+          <span class="grid">Grid</span><span class="x">X</span>
+        </div>
+      </header>
+
+      <main class="game-layout">
+        <!-- Game Panel -->
+        <section id="game-panel" class="glass">
+          <div class="grid-container" id="grid">
+            <!-- Grid generated via JS -->
+            <div id="player" class="character">
+              <img
+                src="imges/player-smail.png"
+                alt="Player"
+                width="40"
+                height="40"
+                style="object-fit: contain"
+              />
+            </div>
+          </div>
+        </section>
+
+        <!-- Code Panel -->
+        <section id="code-panel" class="glass">
+          <div class="editor-header">
+            <h3>console.js</h3>
+            <div
+              class="status-dot"
+              id="fullscreen-toggle"
+              title="Toggle Fullscreen"
+            >
+              <div class="dot"></div>
+              <div class="dot"></div>
+              <div class="dot"></div>
+            </div>
+          </div>
+          <div class="editor-container">
+            <textarea
+              id="code-input"
+              spellcheck="false"
+              placeholder="Write your code here..."
+            >
+// Example
+player.move("right")
+// Check the commands for more</textarea
+            >
+          </div>
+          <div class="panel-controls">
+            <button id="run-btn" class="btn btn-primary">Run Code</button>
+            <button
+              id="toggle-log-btn"
+              class="btn btn-outline"
+              style="color: #cbd5e1; border-color: #334155"
+            >
+              Terminal
+            </button>
+          </div>
+          <div id="output-log" class="output-log">
+            <p class="log-info">> Ready for commands...</p>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- Load Game Modules Sequentially -->
+    <script src="scripts/config.js"></script>
+    <script src="scripts/logger.js"></script>
+    <script src="scripts/nav.js"></script>
+    <script src="scripts/player.js"></script>
+    <script src="scripts/engine.js"></script>
+
+    <!-- CodeMirror Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/edit/closebrackets.min.js"></script>
+
+    <script src="scripts/ui.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

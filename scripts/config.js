@@ -1,0 +1,9 @@
+// Configuration Constants
+window.GRID_SIZE = 8;
+window.ANIMATION_SPEED = 500;
+window.PLAYER_ELEM = document.getElementById('player');
+window.CODE_INPUT = document.getElementById('code-input');
+window.RUN_BTN = document.getElementById('run-btn');
+window.RESET_BTN = document.getElementById('reset-btn');
+window.OUTPUT_LOG = document.getElementById('output-log');
+window.LINE_NUMBERS = document.getElementById('line-numbers');

@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GridX - Commands</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles/style.css" />
+    <link rel="stylesheet" href="./styles/commands.css" />
+  </head>
+  <body class="docs-page">
+    <div class="docs-container">
+      <header class="glass shared-header">
+        <button class="menu-toggle" id="menu-toggle">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </button>
+        <div class="header-controls" id="nav-links">
+          <a href="index.html" class="nav-link">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+            Terminal
+          </a>
+          <a href="about.html" class="nav-link">About</a>
+        </div>
+        <div class="logo">
+          <span class="grid">Grid</span><span class="x">X</span>
+        </div>
+      </header>
+
+      <main class="docs-main">
+        <!-- Hero Section -->
+        <section class="hero-section">
+          <div class="title-badge">Documentation v1.0</div>
+          <h1>Command Reference</h1>
+          <p class="lead">
+            Unlock the full potential of GridX. Use these commands to build
+            powerful scripts. Click any card to expand for details and code
+            examples.
+          </p>
+        </section>
+
+        <!-- Movement Section -->
+        <section class="api-section">
+          <h2 class="section-title">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M5 12h14"></path>
+              <path d="m12 5 7 7-7 7"></path>
+            </svg>
+            Core Movement
+          </h2>
+          <div class="command-list">
+            <details class="command-row">
+              <summary>
+                <div class="cmd-info">
+                  <div class="cmd-icon">
+                    <svg
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="m9 18 6-6-6-6"></path>
+                    </svg>
+                  </div>
+                  <div class="cmd-meta-header">
+                    <span class="cmd-syntax">player.move(direction)</span>
+                    <span class="cmd-brief"
+                      >Basic single-cell navigation step.</span
+                    >
+                  </div>
+                </div>
+                <div class="cmd-actions">
+                  <span class="cmd-type-badge type-std">Standard</span>
+                  <svg
+                    class="cmd-arrow"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="m6 9 6 6 6-6"></path>
+                  </svg>
+                </div>
+              </summary>
+              <div class="cmd-details">
+                <p class="detail-text">
+                  Moves the player exactly one grid unit. If the move is invalid
+                  (e.g. hitting a wall), the execution will crash and stop.
+                  Supports both full names and shorthands.
+                </p>
+                <div class="code-wrapper">
+                  <pre>player.move('right'); <span style="color: #64748b;">// Full version</span>
+player.move('u');     <span style="color: #64748b;">// Shorthand for Up</span></pre>
+                </div>
+              </div>
+            </details>
+
+            <details class="command-row">
+              <summary>
+                <div class="cmd-info">
+                  <div class="cmd-icon">
+                    <svg
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="m6 17 5-5-5-5"></path>
+                      <path d="m13 17 5-5-5-5"></path>
+                    </svg>
+                  </div>
+                  <div class="cmd-meta-header">
+                    <span class="cmd-syntax">player.run(direction)</span>
+                    <span class="cmd-brief"
+                      >Covers twice the distance instantly.</span
+                    >
+                  </div>
+                </div>
+                <div class="cmd-actions">
+                  <span class="cmd-type-badge type-fast">Express</span>
+                  <svg
+                    class="cmd-arrow"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="m6 9 6 6 6-6"></path>
+                  </svg>
+                </div>
+              </summary>
+              <div class="cmd-details">
+                <p class="detail-text">
+                  A high-speed alternative that moves the character two cells in
+                  a single command. Equivalent to calling
+                  <code>move()</code> twice.
+                </p>
+                <div class="code-wrapper">
+                  <pre>player.run('down');
+player.run('l'); <span style="color: #64748b;">// Fast left navigation</span></pre>
+                </div>
+              </div>
+            </details>
+          </div>
+        </section>
+
+        <!-- Logic Section -->
+        <section class="api-section">
+          <h2 class="section-title">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+            </svg>
+            Programmable Logic
+          </h2>
+          <div class="command-list">
+            <details class="command-row">
+              <summary>
+                <div class="cmd-info">
+                  <div class="cmd-icon">
+                    <svg
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <path d="m9 12 2 2 4-4"></path>
+                    </svg>
+                  </div>
+                  <div class="cmd-meta-header">
+                    <span class="cmd-syntax">canMove(direction)</span>
+                    <span class="cmd-brief">Check if the path is clear.</span>
+                  </div>
+                </div>
+                <div class="cmd-actions">
+                  <span class="cmd-type-badge type-logic">Detection</span>
+                  <svg
+                    class="cmd-arrow"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="m6 9 6 6 6-6"></path>
+                  </svg>
+                </div>
+              </summary>
+              <div class="cmd-details">
+                <p class="detail-text">
+                  Returns <code>true</code> if the cell in the specified
+                  direction is within the grid boundaries and accessible. Use it
+                  to avoid crashing.
+                </p>
+                <div class="code-wrapper">
+                  <pre><span style="color: #c792ea;">if</span> (canMove('right')) {
+  player.move('right');
+}</pre>
+                </div>
+              </div>
+            </details>
+
+            <details class="command-row">
+              <summary>
+                <div class="cmd-info">
+                  <div class="cmd-icon">
+                    <svg
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M21 12a9 9 0 1 1-6.21-8.56"></path>
+                    </svg>
+                  </div>
+                  <div class="cmd-meta-header">
+                    <span class="cmd-syntax">repeat(N) { ... }</span>
+                    <span class="cmd-brief">Execute code blocks in loops.</span>
+                  </div>
+                </div>
+                <div class="cmd-actions">
+                  <span class="cmd-type-badge type-logic">Looping</span>
+                  <svg
+                    class="cmd-arrow"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="m6 9 6 6 6-6"></path>
+                  </svg>
+                </div>
+              </summary>
+              <div class="cmd-details">
+                <p class="detail-text">
+                  A high-level loop command that repeats all instructions inside
+                  the curly braces <code>N</code> times. This keeps your code
+                  clean and manageable.
+                </p>
+                <div class="code-wrapper">
+                  <pre>
+repeat(5) {
+  player.move('r');
+  player.move('d');
+}</pre
+                  >
+                </div>
+              </div>
+            </details>
+
+            <details class="command-row">
+              <summary>
+                <div class="cmd-info">
+                  <div class="cmd-icon">
+                    <svg
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="m7 10 5 5 5-5"></path>
+                      <path d="m7 14 5 5 5-5"></path>
+                    </svg>
+                  </div>
+                  <div class="cmd-meta-header">
+                    <span class="cmd-syntax">if / else</span>
+                    <span class="cmd-brief"
+                      >Decision making for dynamic runs.</span
+                    >
+                  </div>
+                </div>
+                <div class="cmd-actions">
+                  <span class="cmd-type-badge type-logic">Decisions</span>
+                  <svg
+                    class="cmd-arrow"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="m6 9 6 6 6-6"></path>
+                  </svg>
+                </div>
+              </summary>
+              <div class="cmd-details">
+                <p class="detail-text">
+                  Control the flow of your script based on conditions. The
+                  <code>else</code> block is optional and executes if the
+                  condition is <code>false</code>.
+                </p>
+                <div class="code-wrapper">
+                  <pre><span style="color: #c792ea;">if</span> (canMove('up')) {
+  player.move('u');
+} <span style="color: #c792ea;">else</span> {
+  player.move('r'); 
+}</pre>
+                </div>
+              </div>
+            </details>
+          </div>
+        </section>
+
+        <!-- Directions Section -->
+        <section class="aliases-section">
+          <h2 class="section-title">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="m16 12-4-4-4 4"></path>
+              <path d="M12 16V8"></path>
+            </svg>
+            Direction Aliases
+          </h2>
+          <div class="aliases-grid">
+            <div class="alias-card">
+              <h3>Right</h3>
+              <code>'right'</code> or <code>'r'</code>
+            </div>
+            <div class="alias-card">
+              <h3>Left</h3>
+              <code>'left'</code> or <code>'l'</code>
+            </div>
+            <div class="alias-card">
+              <h3>Up</h3>
+              <code>'up'</code> or <code>'u'</code>
+            </div>
+            <div class="alias-card">
+              <h3>Down</h3>
+              <code>'down'</code> or <code>'d'</code>
+            </div>
+          </div>
+        </section>
+
+        <!-- Advanced Scenario -->
+        <section class="example-footer">
+          <h2 class="section-title">Pro Tip: Nested Logic</h2>
+          <p class="detail-text">
+            You can nest <code>if</code> statements inside
+            <code>repeat</code> loops for complex pathfinding:
+          </p>
+          <div class="code-wrapper">
+            <pre><span style="color: #64748b;">// Dynamic wall-tracing algorithm</span>
+repeat(10) {
+  <span style="color: #c792ea;">if</span> (canMove('r')) {
+    player.move('r');
+  } <span style="color: #c792ea;">else</span> {
+    player.move('d');
+  }
+}</pre>
+          </div>
+        </section>
+      </main>
+
+      <footer>
+        <p>
+          &copy; 2026 GridX | Made by Yasser811 |
+          <a href="https://github.com/yasser8111" class="footer-link">GitHub</a>
+        </p>
+      </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="scripts/nav.js"></script>
+    <script>
+      // Single-open accordion logic
+      const details = document.querySelectorAll("details.command-row");
+      details.forEach((targetDetail) => {
+        targetDetail.addEventListener("click", (e) => {
+          if (!targetDetail.hasAttribute("open")) {
+            details.forEach((detail) => {
+              if (detail !== targetDetail) {
+                detail.removeAttribute("open");
+              }
+            });
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
