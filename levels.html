@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GridX - Levels</title>
+    <link rel="icon" type="image/png" href="imges/logo.png" />
+    <meta name="description" content="Select a level to play in GridX." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=IBM+Plex+Sans+Arabic:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles/style.css" />
+    <link rel="stylesheet" href="./styles/levels.css" />
+  </head>
+  <body>
+    <div id="app" class="levels-app">
+      <header class="glass shared-header">
+        <button class="menu-toggle" id="menu-toggle">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </button>
+        <div class="header-controls" id="nav-links">
+          <a href="index.html" class="nav-link">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+            Terminal
+          </a>
+          <a href="about.html" class="nav-link">About</a>
+        </div>
+        <div class="logo">
+          <span class="grid">Grid</span><span class="x">X</span>
+        </div>
+      </header>
+
+      <main class="levels-container">
+        <div class="levels-header">
+          <h1>Select Phase</h1>
+          <p>Choose a level to start coding your way to the door.</p>
+        </div>
+
+        <div class="levels-grid" id="levels-grid">
+          <!-- Dynamically populated via JS -->
+        </div>
+      </main>
+    </div>
+
+    <!-- Load Game Modules needed for LEVELS data -->
+    <script src="scripts/levels.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", async () => {
+        if (window.initLevels) {
+          await window.initLevels();
+        }
+        
+        const grid = document.getElementById("levels-grid");
+        let currentLevel = 0;
+
+        const saved = localStorage.getItem("gridx_level");
+        if (saved !== null) {
+          currentLevel = parseInt(saved);
+        }
+
+        if (window.LEVELS) {
+          window.LEVELS.forEach((level, index) => {
+            const card = document.createElement("div");
+            card.className = "level-card glass";
+
+            // Allow clicking any unlocked level (we allow all up to the max unlocked, for now lets unlock sequentially)
+            // Or maybe just let the user click ANY level for fun? Let's just lock future levels.
+            if (index <= currentLevel) {
+              card.classList.add("unlocked");
+            } else {
+              card.classList.add("locked");
+            }
+
+            const isCompleted = index < currentLevel;
+            const isCurrent = index === currentLevel;
+
+            let statusHtml = "";
+            if (isCompleted) {
+              statusHtml =
+                '<div class="status-badge completed">Completed</div>';
+            } else if (isCurrent) {
+              statusHtml = '<div class="status-badge current">Current</div>';
+            } else {
+              statusHtml = '<div class="status-badge locked">Locked</div>';
+            }
+
+            card.innerHTML = `
+              ${statusHtml}
+              <div class="level-card-number">${level.id}</div>
+              <h3 class="level-card-title">${level.title}</h3>
+              <p class="level-card-desc">${level.description}</p>
+            `;
+
+            if (index <= currentLevel) {
+              card.addEventListener("click", () => {
+                localStorage.setItem("gridx_level", index);
+                window.location.href = "index.html";
+              });
+            }
+
+            grid.appendChild(card);
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

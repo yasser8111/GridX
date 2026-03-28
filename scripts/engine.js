@@ -17,43 +17,57 @@ window.runCode = async function() {
     }
 
     window.isRunning = true;
-    window.stopExecution = false; // Reset for new run
+    window.stopExecution = false;
     window.RUN_BTN.innerText = 'Stop Code';
-    window.RUN_BTN.classList.add('btn-danger'); // Add red color for stop
+    window.RUN_BTN.classList.add('btn-danger');
     
-    // Start from beginning each time code runs
+    // Reset player to level start
     window.resetPlayer(); 
     
     window.clearLog();
-    window.log('Executing code from start...', 'info');
+    window.log('Executing code...', 'info');
     
-    // Give user a moment to see the reset
     const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
     await sleep(300);
 
     try {
         let processedCode = code;
         
-        // repeat
+        // loop
         let loopId = 0;
-        processedCode = processedCode.replace(/repeat\s*\(\s*([^)]+)\s*\)\s*\{/g, (match, count) => {
+        processedCode = processedCode.replace(/for\s*\(\s*([^)]+)\s*\)\s*\{/g, (match, count) => {
             const id = loopId++;
             return `for (let __r${id} = 0; __r${id} < ${count}; __r${id}++) {`;
         });
         
+        // Functions support
+        const customFuncs = [...processedCode.matchAll(/function\s+([a-zA-Z0-9_]+)/g)].map(m => m[1]);
+        processedCode = processedCode.replace(/function\s+([a-zA-Z0-9_]+)\s*\(/g, "async function $1(");
+        customFuncs.forEach(fn => {
+            const callRegex = new RegExp(`\\b${fn}\\s*\\(`, 'g');
+            processedCode = processedCode.replace(callRegex, `await ${fn}(`);
+        });
+        // Cleanup replacements
+        processedCode = processedCode.replace(/async\s+function\s+await\s+/g, "async function ");
+        processedCode = processedCode.replace(/await\s+await\s+/g, "await ");
+        
         // player
-        processedCode = processedCode.replace(/(player\.(move|run|move[RLUD])\(.*\))/g, "await $1");
+        processedCode = processedCode.replace(/(player\.(move|run|take|open|push|pull)\(.*\))/g, "await $1");
         
         const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
-        // Inject global helpers
         const execute = new AsyncFunction("canMove", processedCode);
         
         await execute(window.canMove);
         
         if (window.stopExecution) {
-            window.log('Execution stopped by user.', 'info');
+            window.log('Execution stopped.', 'info');
         } else {
-            window.log('Code execution completed successfully!', 'success');
+            // Check win condition
+            if (window.checkWinCondition && window.checkWinCondition()) {
+                window.winLevel();
+            } else {
+                window.log('Code finished. But you didn\'t reach the goal!', 'error');
+            }
         }
     } catch (err) {
         if (err.message === "STOPPED_BY_USER") {

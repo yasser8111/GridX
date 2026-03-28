@@ -1,0 +1,204 @@
+[
+  {
+    "id": 1,
+    "title": "First Steps",
+    "description": "Welcome to GridX! Your goal is to reach the door. Use the player.move() command.",
+    "hint": "player.move('right');\nplayer.move('right');\nplayer.move('right');",
+    "gridSize": 4,
+    "start": { "x": 0, "y": 0 },
+    "goal": { "x": 3, "y": 0, "locked": false },
+    "walls": [],
+    "items": [],
+    "boxes": []
+  },
+  {
+    "id": 2,
+    "title": "Turning Corners",
+    "description": "The door is hidden around the corner. You'll need to use different directions.",
+    "hint": "player.move('right');\nplayer.move('right');\nplayer.move('down');\nplayer.move('down');",
+    "gridSize": 4,
+    "start": { "x": 0, "y": 0 },
+    "goal": { "x": 2, "y": 2, "locked": false },
+    "walls": [
+      { "x": 0, "y": 1 },
+      { "x": 1, "y": 1 }
+    ],
+    "items": [],
+    "boxes": []
+  },
+  {
+    "id": 3,
+    "title": "Express Delivery",
+    "description": "The door is far! Use player.run() to move twice as fast in a single command.",
+    "hint": "player.run('right');\nplayer.run('right');",
+    "gridSize": 5,
+    "start": { "x": 0, "y": 2 },
+    "goal": { "x": 4, "y": 2, "locked": false },
+    "walls": [],
+    "items": [],
+    "boxes": []
+  },
+  {
+    "id": 4,
+    "title": "Loop It",
+    "description": "Repeating commands is boring. Use a for loop to write efficient code!",
+    "hint": "for(5) {\n  player.move('right');\n}",
+    "gridSize": 6,
+    "start": { "x": 0, "y": 3 },
+    "goal": { "x": 5, "y": 3, "locked": false },
+    "walls": [],
+    "items": [],
+    "boxes": []
+  },
+  {
+    "id": 5,
+    "title": "Obstacle Course",
+    "description": "Navigate through the walls carefully! Combine loops and simple moves.",
+    "hint": "for(3) { player.move('down'); }\nfor(2) { player.move('right'); }\nfor(2) { player.move('up'); }\nfor(2) { player.move('right'); }\nfor(3) { player.move('down'); }",
+    "gridSize": 5,
+    "start": { "x": 0, "y": 0 },
+    "goal": { "x": 4, "y": 4, "locked": false },
+    "walls": [
+      { "x": 1, "y": 0 },
+      { "x": 1, "y": 1 },
+      { "x": 1, "y": 2 },
+      { "x": 3, "y": 4 },
+      { "x": 3, "y": 3 },
+      { "x": 3, "y": 2 }
+    ],
+    "items": [],
+    "boxes": []
+  },
+  {
+    "id": 6,
+    "title": "The Key to Success",
+    "description": "The door is locked! You must stand on the key and use player.take('key'), then open the door.",
+    "hint": "player.run('right');\nplayer.take('key');\nplayer.move('right');\nplayer.move('right');\nplayer.open('door');",
+    "gridSize": 5,
+    "start": { "x": 0, "y": 2 },
+    "goal": { "x": 4, "y": 2, "locked": true },
+    "walls": [],
+    "items": [
+      { "x": 2, "y": 2, "type": "key" }
+    ],
+    "boxes": []
+  },
+  {
+    "id": 7,
+    "title": "Heavy Lifting",
+    "description": "A heavy box blocks your path. Stand next to it and use player.push('box') to clear the way!",
+    "hint": "player.run('right');\nplayer.push('box');\nplayer.run('right');",
+    "gridSize": 6,
+    "start": { "x": 0, "y": 2 },
+    "goal": { "x": 5, "y": 2, "locked": false },
+    "walls": [
+      { "x": 2, "y": 1 },
+      { "x": 2, "y": 3 }
+    ],
+    "items": [],
+    "boxes": [
+      { "x": 2, "y": 2 }
+    ]
+  },
+  {
+    "id": 8,
+    "title": "Pull it Back",
+    "description": "Pushing won't work here! Turn around and use player.pull('box') to drag it backward.",
+    "hint": "player.pull('box');\nplayer.move('down');\nfor(3) { player.move('right'); }",
+    "gridSize": 5,
+    "start": { "x": 2, "y": 1 },
+    "goal": { "x": 4, "y": 2, "locked": false },
+    "walls": [
+      { "x": 4, "y": 1 },
+      { "x": 3, "y": 0 }
+    ],
+    "items": [],
+    "boxes": [
+      { "x": 3, "y": 1 }
+    ]
+  },
+  {
+    "id": 9,
+    "title": "Smart Navigation",
+    "description": "You don't know where the wall is! Use canMove() inside if/else inside a loop.",
+    "hint": "for(5) {\n  if (canMove('right')) {\n    player.move('right');\n  } else {\n    player.move('down');\n    player.move('right');\n    player.move('up');\n  }\n}",
+    "gridSize": 6,
+    "start": { "x": 0, "y": 2 },
+    "goal": { "x": 5, "y": 2, "locked": false },
+    "walls": [
+      { "x": 3, "y": 2 }
+    ],
+    "items": [],
+    "boxes": []
+  },
+  {
+    "id": 10,
+    "title": "Reusable Logic",
+    "description": "Create a custom function staircase() that moves down then right, and call it multiple times.",
+    "hint": "function staircase() {\n  player.move('down');\n  player.move('right');\n}\n\nfor(5) {\n  staircase();\n}",
+    "gridSize": 6,
+    "start": { "x": 0, "y": 0 },
+    "goal": { "x": 5, "y": 5, "locked": false },
+    "walls": [
+      { "x": 1, "y": 0 },
+      { "x": 2, "y": 1 },
+      { "x": 3, "y": 2 },
+      { "x": 4, "y": 3 },
+      { "x": 5, "y": 4 }
+    ],
+    "items": [],
+    "boxes": []
+  },
+  {
+    "id": 11,
+    "title": "The Collector's Puzzle",
+    "description": "Combine your skills! Find a way to grab the key, push the box out of the way, and unlock the door.",
+    "hint": "player.move('u'); player.move('r'); player.take('key');\nplayer.push('box');\nplayer.move('d');\nplayer.run('r');\nplayer.open('door');",
+    "gridSize": 6,
+    "start": { "x": 1, "y": 2 },
+    "goal": { "x": 5, "y": 2, "locked": true },
+    "walls": [
+      { "x": 1, "y": 3 },
+      { "x": 3, "y": 3 },
+      { "x": 4, "y": 3 },
+      { "x": 5, "y": 3 },
+      { "x": 3, "y": 1 },
+      { "x": 4, "y": 1 },
+      { "x": 5, "y": 1 }
+    ],
+    "items": [
+      { "x": 2, "y": 1, "type": "key" }
+    ],
+    "boxes": [
+      { "x": 2, "y": 2 }
+    ]
+  },
+  {
+    "id": 12,
+    "title": "Master of GridX",
+    "description": "The ultimate challenge. Navigate walls, boxes, and locked doors to escape!",
+    "hint": "Use functions to clean your code, avoid boxes blocking narrow paths, push boxes carefully and pick up the key!",
+    "gridSize": 7,
+    "start": { "x": 0, "y": 6 },
+    "goal": { "x": 6, "y": 0, "locked": true },
+    "walls": [
+      { "x": 0, "y": 5 },
+      { "x": 1, "y": 5 },
+      { "x": 3, "y": 6 },
+      { "x": 3, "y": 5 },
+      { "x": 3, "y": 4 },
+      { "x": 3, "y": 3 },
+      { "x": 4, "y": 3 },
+      { "x": 4, "y": 2 },
+      { "x": 1, "y": 1 }
+    ],
+    "items": [
+      { "x": 2, "y": 4, "type": "key" }
+    ],
+    "boxes": [
+      { "x": 0, "y": 3 },
+      { "x": 2, "y": 6 },
+      { "x": 6, "y": 2 }
+    ]
+  }
+]

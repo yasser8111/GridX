@@ -1,0 +1,128 @@
+/* =============================================
+   LEVELS PAGE STYLES
+   ============================================= */
+
+.levels-app {
+  height: auto !important;
+  min-height: 90vh;
+}
+
+.back-link {
+  color: var(--text-main);
+  font-size: 1rem;
+}
+
+.back-link:hover {
+  color: var(--primary-purple);
+  transform: translateX(-2px);
+}
+
+.levels-container {
+  padding: 40px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.levels-header {
+  text-align: center;
+}
+
+.levels-header h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 10px;
+}
+
+.levels-header p {
+  color: var(--text-muted);
+  font-size: 1.1rem;
+}
+
+.levels-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.level-card {
+  position: relative;
+  padding: 24px;
+  border-radius: 16px;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border: 1px solid var(--border-light);
+  background: var(--surface);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.level-card.unlocked:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 15px 30px -10px rgba(139, 92, 246, 0.2);
+  border-color: rgba(139, 92, 246, 0.3);
+}
+
+.level-card.locked {
+  opacity: 0.6;
+  cursor: not-allowed;
+  filter: grayscale(1);
+}
+
+.status-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 20px;
+  letter-spacing: 1px;
+}
+
+.status-badge.completed {
+  background: rgba(52, 211, 153, 0.15);
+  color: #10b981;
+}
+
+.status-badge.current {
+  background: rgba(139, 92, 246, 0.15);
+  color: var(--primary-purple);
+}
+
+.status-badge.locked {
+  background: rgba(100, 116, 139, 0.15);
+  color: var(--text-muted);
+}
+
+.level-card-number {
+  font-size: 3rem;
+  font-weight: 800;
+  color: rgba(139, 92, 246, 0.1);
+  line-height: 1;
+  margin-bottom: -10px;
+}
+
+.level-card-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-main);
+  z-index: 1;
+}
+
+.level-card-desc {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  z-index: 1;
+}
+
+@media (max-width: 768px) {
+  .levels-grid {
+    grid-template-columns: 1fr;
+  }
+}

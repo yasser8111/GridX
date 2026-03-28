@@ -82,8 +82,10 @@
   padding-left: 8px;
 }
 
-.section-title svg {
+.section-title svg,
+.section-title .material-symbols-rounded {
   color: var(--primary-purple);
+  font-size: 28px;
 }
 
 /* --- Command List (Accordion) --- */

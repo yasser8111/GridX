@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GridX - Code Your Way</title>
+    <link rel="icon" type="image/png" href="imges/logo.png" />
     <meta
       name="description"
       content="An interactive coding game where you control your character with code."
@@ -31,6 +32,7 @@
         </button>
         <div class="header-controls" id="nav-links">
           <a href="commands.html" class="nav-link">Commands</a>
+          <a href="levels.html" class="nav-link">Levels</a>
           <a href="about.html" class="nav-link">About</a>
         </div>
         <div class="logo">
@@ -41,6 +43,33 @@
       <main class="game-layout">
         <!-- Game Panel -->
         <section id="game-panel" class="glass">
+          <div class="game-panel-header">
+            <div class="header-left">
+              <h2 class="level-title" id="level-title">First Steps</h2>
+              <p class="level-desc" id="level-desc">
+                Move right to reach the door!
+              </p>
+            </div>
+            <div class="header-right">
+              <button class="btn btn-hint" id="hint-btn" title="Show Hint">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                  <circle cx="12" cy="12" r="10"></circle>
+                </svg>
+                Hint
+              </button>
+            </div>
+          </div>
           <div class="grid-container" id="grid">
             <!-- Grid generated via JS -->
             <div id="player" class="character">
@@ -75,9 +104,8 @@
               spellcheck="false"
               placeholder="Write your code here..."
             >
-// Example
-player.move("right")
-// Check the commands for more</textarea
+// Move right to reach the door!
+player.move("right")</textarea
             >
           </div>
           <div class="panel-controls">
@@ -97,10 +125,23 @@ player.move("right")
       </main>
     </div>
 
+    <!-- Win Overlay -->
+    <div class="win-overlay" id="win-overlay">
+      <div class="win-card glass">
+        <div class="win-emoji">🎉</div>
+        <h2>Level Complete!</h2>
+        <p id="win-message">Great job!</p>
+        <button class="btn btn-primary" id="next-level-overlay-btn">
+          Next Level
+        </button>
+      </div>
+    </div>
+
     <!-- Load Game Modules Sequentially -->
     <script src="scripts/config.js"></script>
     <script src="scripts/logger.js"></script>
     <script src="scripts/nav.js"></script>
+    <script src="scripts/levels.js"></script>
     <script src="scripts/player.js"></script>
     <script src="scripts/engine.js"></script>
 
