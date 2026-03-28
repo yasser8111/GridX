@@ -5,7 +5,7 @@ GridX is an interactive, educational coding game designed to teach the fundament
 ---
 
 ## 🚀 Live Demo
-**[GridX Live](https://yasser8111.github.io/Javascript/)** 
+**[GridX Live](https://gridx811.vercel.app)** 
 *(Note: Replace with your actual deployment link if different)*
 
 ---
