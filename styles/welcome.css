@@ -1,0 +1,268 @@
+/* --- Welcome Page Styling (Modular & Simple) --- */
+.welcome-page {
+  background-color: var(--bg);
+  min-height: 100vh;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.welcome-container {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.landing-blocks {
+  display: flex;
+  flex-direction: column;
+  gap: 80px;
+  margin: 0 auto;
+  max-width: 1000px;
+  width: 100%;
+  padding: 80px 24px;
+  box-sizing: border-box;
+}
+
+.hero-simple {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100px 24px;
+  text-align: center;
+  width: 100%;
+  min-height: 85vh;
+  box-sizing: border-box;
+}
+
+.hero-fusion-simple {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.icon-hero {
+  font-size: 32px;
+}
+
+.icon-hero:first-child { color: var(--primary-blue); }
+.icon-hero:last-child { color: var(--primary-purple); }
+
+.icon-divider {
+  width: 1px;
+  height: 20px;
+  background: linear-gradient(to bottom, var(--primary-blue), var(--primary-purple));
+  opacity: 0.3;
+}
+
+.hero-title-simple {
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 1.1;
+  margin-bottom: 20px;
+  letter-spacing: -1.5px;
+}
+
+.hero-subtitle-simple {
+  font-size: 1.2rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 40px;
+  max-width: 550px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.hero-actions-simple {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+
+/* Button layout tweaks for hero only, keeping style.css core */
+.btn-hero-width {
+  min-width: 140px;
+  padding: 12px 24px;
+}
+
+/* 2. Features Section */
+.features-section {
+  width: 100%;
+}
+.section-heading {
+  font-size: 2.2rem;
+  text-align: center;
+  margin-bottom: 40px;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.feature-box {
+  padding: 30px 24px;
+  border-radius: 20px;
+  text-align: center;
+  transition: transform 0.3s;
+}
+.feature-box:hover {
+  transform: translateY(-5px);
+}
+
+.fb-icon {
+  font-size: 40px;
+  color: var(--primary-blue);
+  margin-bottom: 16px;
+}
+
+.feature-box h3 {
+  font-size: 1.3rem;
+  margin-bottom: 12px;
+  color: var(--text-main);
+}
+
+.feature-box p {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* 3. Showcase Section */
+.showcase-content {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  align-items: center;
+  gap: 40px;
+  padding: 40px;
+  border-radius: 24px;
+}
+
+.showcase-text h2 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  line-height: 1.2;
+  color: var(--text-main);
+  font-weight: 800;
+}
+
+.showcase-text p {
+  color: var(--text-muted);
+  line-height: 1.6;
+  font-size: 1.05rem;
+  margin-bottom: 24px;
+}
+
+.benefits {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.benefits li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  color: var(--text-main);
+  font-weight: 500;
+  font-size: 1.05rem;
+}
+
+.text-green { color: #10b981; }
+
+.showcase-image {
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.showcase-image:hover {
+  transform: translateY(-5px) scale(1.02);
+}
+
+.gameplay-mockup {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* 4. Final CTA */
+.cta-section {
+  text-align: center;
+  padding: 60px 20px;
+  background: rgba(139, 92, 246, 0.1);
+  border-radius: 24px;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.cta-section h2 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin-bottom: 12px;
+  color: var(--text-main);
+}
+
+.cta-desc {
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  margin-bottom: 30px;
+}
+
+footer {
+  text-align: center;
+  padding: 30px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Responsiveness */
+@media (max-width: 900px) {
+  .features-grid {
+    grid-template-columns: 1fr;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+  .showcase-content {
+    grid-template-columns: 1fr;
+    text-align: center;
+    padding: 30px;
+  }
+  .benefits li {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .simple-hero {
+    padding: 40px 20px;
+  }
+  .simple-title {
+    font-size: 2.2rem;
+  }
+  .hero-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 12px;
+  }
+  .btn-hero {
+    width: 100%;
+  }
+  .landing-blocks {
+    gap: 60px;
+  }
+}

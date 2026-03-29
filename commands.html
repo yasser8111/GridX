@@ -27,11 +27,13 @@
           <span class="bar"></span>
         </button>
         <div class="header-controls" id="nav-links">
-          <a href="index.html" class="nav-link">
-            <span class="material-symbols-rounded" style="font-size: 1rem;">arrow_back_ios</span>
-            Terminal
-          </a>
-          
+          <span
+            class="material-symbols-rounded nav-link"
+            style="font-size: 1rem; cursor: pointer"
+            onclick="window.history.back()"
+            >arrow_back_ios</span
+          >
+          <a href="commands.html" class="nav-link">Docs</a>
           <a href="levels.html" class="nav-link">Levels</a>
           <a href="about.html" class="nav-link">About</a>
         </div>
@@ -74,7 +76,9 @@
                 </div>
                 <div class="cmd-actions">
                   <span class="cmd-type-badge type-std">Standard</span>
-                  <span class="material-symbols-rounded cmd-arrow">expand_more</span>
+                  <span class="material-symbols-rounded cmd-arrow"
+                    >expand_more</span
+                  >
                 </div>
               </summary>
               <div class="cmd-details">
@@ -105,7 +109,9 @@ player.move('u');     <span style="color: #64748b;">// Shorthand for Up</span></
                 </div>
                 <div class="cmd-actions">
                   <span class="cmd-type-badge type-fast">Express</span>
-                  <span class="material-symbols-rounded cmd-arrow">expand_more</span>
+                  <span class="material-symbols-rounded cmd-arrow"
+                    >expand_more</span
+                  >
                 </div>
               </summary>
               <div class="cmd-details">
@@ -138,17 +144,30 @@ player.run('l'); <span style="color: #64748b;">// Fast left navigation</span></p
                   </div>
                   <div class="cmd-meta-header">
                     <span class="cmd-syntax">player.take("item")</span>
-                    <span class="cmd-brief">Picks up an item from the specific spot.</span>
+                    <span class="cmd-brief"
+                      >Picks up an item from the specific spot.</span
+                    >
                   </div>
                 </div>
                 <div class="cmd-actions">
-                  <span class="cmd-type-badge type-logic" style="background: rgba(16, 185, 129, 0.1); color: #10b981; border-color: rgba(16, 185, 129, 0.3);">Action</span>
-                  <span class="material-symbols-rounded cmd-arrow">expand_more</span>
+                  <span
+                    class="cmd-type-badge type-logic"
+                    style="
+                      background: rgba(16, 185, 129, 0.1);
+                      color: #10b981;
+                      border-color: rgba(16, 185, 129, 0.3);
+                    "
+                    >Action</span
+                  >
+                  <span class="material-symbols-rounded cmd-arrow"
+                    >expand_more</span
+                  >
                 </div>
               </summary>
               <div class="cmd-details">
                 <p class="detail-text">
-                  Used to collect items (like keys) that are on the same cell as the player.
+                  Used to collect items (like keys) that are on the same cell as
+                  the player.
                 </p>
                 <div class="code-wrapper">
                   <pre>player.take('key'); <span style="color: #64748b;">// Picks up the key</span></pre>
@@ -168,13 +187,24 @@ player.run('l'); <span style="color: #64748b;">// Fast left navigation</span></p
                   </div>
                 </div>
                 <div class="cmd-actions">
-                  <span class="cmd-type-badge type-logic" style="background: rgba(16, 185, 129, 0.1); color: #10b981; border-color: rgba(16, 185, 129, 0.3);">Action</span>
-                  <span class="material-symbols-rounded cmd-arrow">expand_more</span>
+                  <span
+                    class="cmd-type-badge type-logic"
+                    style="
+                      background: rgba(16, 185, 129, 0.1);
+                      color: #10b981;
+                      border-color: rgba(16, 185, 129, 0.3);
+                    "
+                    >Action</span
+                  >
+                  <span class="material-symbols-rounded cmd-arrow"
+                    >expand_more</span
+                  >
                 </div>
               </summary>
               <div class="cmd-details">
                 <p class="detail-text">
-                  Opens a locked door. You must be adjacent to the door or directly on it, and have already collected a key.
+                  Opens a locked door. You must be adjacent to the door or
+                  directly on it, and have already collected a key.
                 </p>
                 <div class="code-wrapper">
                   <pre>player.open('door');</pre>
@@ -190,17 +220,31 @@ player.run('l'); <span style="color: #64748b;">// Fast left navigation</span></p
                   </div>
                   <div class="cmd-meta-header">
                     <span class="cmd-syntax">player.push("box")</span>
-                    <span class="cmd-brief">Pushes a nearby box 1 block away.</span>
+                    <span class="cmd-brief"
+                      >Pushes a nearby box 1 block away.</span
+                    >
                   </div>
                 </div>
                 <div class="cmd-actions">
-                  <span class="cmd-type-badge type-logic" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b; border-color: rgba(245, 158, 11, 0.3);">Physics</span>
-                  <span class="material-symbols-rounded cmd-arrow">expand_more</span>
+                  <span
+                    class="cmd-type-badge type-logic"
+                    style="
+                      background: rgba(245, 158, 11, 0.1);
+                      color: #f59e0b;
+                      border-color: rgba(245, 158, 11, 0.3);
+                    "
+                    >Physics</span
+                  >
+                  <span class="material-symbols-rounded cmd-arrow"
+                    >expand_more</span
+                  >
                 </div>
               </summary>
               <div class="cmd-details">
                 <p class="detail-text">
-                  If you are standing directly next to a box, this pushes the box 1 space away from you. Box cannot be pushed into walls or boundaries.
+                  If you are standing directly next to a box, this pushes the
+                  box 1 space away from you. Box cannot be pushed into walls or
+                  boundaries.
                 </p>
                 <div class="code-wrapper">
                   <pre>player.push('box');</pre>
@@ -216,17 +260,30 @@ player.run('l'); <span style="color: #64748b;">// Fast left navigation</span></p
                   </div>
                   <div class="cmd-meta-header">
                     <span class="cmd-syntax">player.pull("box")</span>
-                    <span class="cmd-brief">Pulls a nearby box towards you.</span>
+                    <span class="cmd-brief"
+                      >Pulls a nearby box towards you.</span
+                    >
                   </div>
                 </div>
                 <div class="cmd-actions">
-                  <span class="cmd-type-badge type-logic" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b; border-color: rgba(245, 158, 11, 0.3);">Physics</span>
-                  <span class="material-symbols-rounded cmd-arrow">expand_more</span>
+                  <span
+                    class="cmd-type-badge type-logic"
+                    style="
+                      background: rgba(245, 158, 11, 0.1);
+                      color: #f59e0b;
+                      border-color: rgba(245, 158, 11, 0.3);
+                    "
+                    >Physics</span
+                  >
+                  <span class="material-symbols-rounded cmd-arrow"
+                    >expand_more</span
+                  >
                 </div>
               </summary>
               <div class="cmd-details">
                 <p class="detail-text">
-                  If you are standing directly next to a box, you take a step backward and drag the box into the space you just left.
+                  If you are standing directly next to a box, you take a step
+                  backward and drag the box into the space you just left.
                 </p>
                 <div class="code-wrapper">
                   <pre>player.pull('box');</pre>
@@ -256,7 +313,9 @@ player.run('l'); <span style="color: #64748b;">// Fast left navigation</span></p
                 </div>
                 <div class="cmd-actions">
                   <span class="cmd-type-badge type-logic">Detection</span>
-                  <span class="material-symbols-rounded cmd-arrow">expand_more</span>
+                  <span class="material-symbols-rounded cmd-arrow"
+                    >expand_more</span
+                  >
                 </div>
               </summary>
               <div class="cmd-details">
@@ -286,7 +345,9 @@ player.run('l'); <span style="color: #64748b;">// Fast left navigation</span></p
                 </div>
                 <div class="cmd-actions">
                   <span class="cmd-type-badge type-logic">Looping</span>
-                  <span class="material-symbols-rounded cmd-arrow">expand_more</span>
+                  <span class="material-symbols-rounded cmd-arrow"
+                    >expand_more</span
+                  >
                 </div>
               </summary>
               <div class="cmd-details">
@@ -321,7 +382,9 @@ for(5) {
                 </div>
                 <div class="cmd-actions">
                   <span class="cmd-type-badge type-logic">Decisions</span>
-                  <span class="material-symbols-rounded cmd-arrow">expand_more</span>
+                  <span class="material-symbols-rounded cmd-arrow"
+                    >expand_more</span
+                  >
                 </div>
               </summary>
               <div class="cmd-details">
@@ -353,12 +416,15 @@ for(5) {
                 </div>
                 <div class="cmd-actions">
                   <span class="cmd-type-badge type-logic">Structure</span>
-                  <span class="material-symbols-rounded cmd-arrow">expand_more</span>
+                  <span class="material-symbols-rounded cmd-arrow"
+                    >expand_more</span
+                  >
                 </div>
               </summary>
               <div class="cmd-details">
                 <p class="detail-text">
-                  Define custom functions to group commands together. Call your function anywhere in the script to avoid repeating code.
+                  Define custom functions to group commands together. Call your
+                  function anywhere in the script to avoid repeating code.
                 </p>
                 <div class="code-wrapper">
                   <pre><span style="color: #c792ea;">function</span> moveAngle() {

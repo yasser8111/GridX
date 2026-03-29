@@ -182,7 +182,7 @@ body {
   position: absolute;
   top: 0;
   left: 0;
-  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 10;
 }
 
@@ -763,10 +763,10 @@ footer {
 
 .grid-box {
   transition:
-    opacity 0.4s ease,
-    transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
-    grid-column 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
-    grid-row 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    opacity 0.5s ease,
+    transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    grid-column 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    grid-row 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   background: rgba(139, 92, 246, 0.05); /* optional subtle styling */
 }
 

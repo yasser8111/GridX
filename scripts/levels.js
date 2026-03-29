@@ -1,235 +1,163 @@
-// Levels System Module
-// Each level has: grid size, player start, goal, walls, hint, and description
+/**
+ * GridX Level Management
+ * ----------------------
+ * Handles loading, progress saving, and rendering of levels.
+ */
 
-window.LEVELS = [];
+window.GridX.LevelManager = {
+  // --- Data Loading & Progress ---
+  async init() {
+    try {
+      const response = await fetch("levels.json");
+      if (!response.ok) throw new Error("Could not load levels.json");
+      window.GridX.State.levels = await response.json();
+    } catch (err) {
+      window.GridX.Logger.log("Error loading levels. Are you running this via a local server?", "error");
+    }
+  },
 
-window.initLevels = async function () {
-  try {
-    const response = await fetch("levels.json");
-    if (!response.ok) throw new Error("Could not load levels.json");
-    window.LEVELS = await response.json();
-  } catch (err) {
-    console.error("Error loading levels:", err);
-    window.log("Error loading levels. Are you running this via a local server (e.g. Live Server)?", "error");
-  }
-};
+  saveProgress() {
+    localStorage.setItem("gridx_level", window.GridX.State.currentLevelIndex);
+  },
 
-// Current Level State
-window.currentLevel = 0;
-window.collectedItems = [];
+  loadProgress() {
+    const saved = localStorage.getItem("gridx_level");
+    if (saved !== null) {
+      window.GridX.State.currentLevelIndex = parseInt(saved);
+    }
+  },
 
-// Save/Load Progress
-window.saveProgress = function () {
-  localStorage.setItem("gridx_level", window.currentLevel);
-};
+  // --- Level Rendering ---
+  loadLevel(index) {
+    const level = window.GridX.State.levels[index];
+    if (!level) return;
 
-window.loadProgress = function () {
-  const saved = localStorage.getItem("gridx_level");
-  if (saved !== null) {
-    window.currentLevel = parseInt(saved);
-  }
-};
+    // Reset State
+    const state = window.GridX.State;
+    state.currentLevelIndex = index;
+    state.collectedItems = [];
+    state.doorUnlocked = false;
+    state.gridSize = level.gridSize;
+    state.playerPos = { ...level.start };
+    this.saveProgress();
 
-// Load a specific level
-window.loadLevel = function (levelIndex) {
-  const level = window.LEVELS[levelIndex];
-  if (!level) return;
+    // Reset UI
+    this.setupGridDimensions(level.gridSize);
+    this.renderLevelElements(level);
+    this.updateLevelUI(level);
 
-  window.currentLevel = levelIndex;
-  window.collectedItems = [];
-  window.saveProgress();
+    if (window.GridX.PlayerControl) {
+      window.GridX.PlayerControl.resetRepresentation();
+    }
+    
+    if (window.editor) {
+      window.editor.setValue("// " + level.description + "\n");
+    }
 
-  // Update grid size
-  window.GRID_SIZE = level.gridSize;
-  document.documentElement.style.setProperty("--grid-cols", level.gridSize);
-  document.documentElement.style.setProperty("--grid-rows", level.gridSize);
+    window.GridX.Logger.clear();
+    window.GridX.Logger.log(`Level ${level.id}: ${level.title}`, "info");
+    window.GridX.Logger.log(level.description, "info");
+  },
 
-  // Set player start position
-  window.playerPos = { x: level.start.x, y: level.start.y };
-  
-  // Reset player image
-  const playerElem = document.getElementById("player");
-  if (playerElem) {
-    const img = playerElem.querySelector("img");
-    if (img) img.src = "imges/player-smail.png";
-  }
+  setupGridDimensions(size) {
+    const grid = window.GridX.DOM.grid;
+    document.documentElement.style.setProperty("--grid-cols", size);
+    document.documentElement.style.setProperty("--grid-rows", size);
+    
+    // Clear old elements (keep player)
+    const elementsToRemove = grid.querySelectorAll(".grid-wall, .grid-goal, .grid-item, .grid-box");
+    elementsToRemove.forEach(el => el.remove());
+  },
 
-  // Clear grid overlays
-  const grid = document.getElementById("grid");
-  grid
-    .querySelectorAll(".grid-wall, .grid-goal, .grid-item")
-    .forEach((el) => el.remove());
+  renderLevelElements(level) {
+    const grid = window.GridX.DOM.grid;
 
-  // Render walls
-  level.walls.forEach((wall) => {
-    const div = document.createElement("div");
-    div.className = "grid-wall";
-    div.style.gridColumn = wall.x + 1;
-    div.style.gridRow = wall.y + 1;
-    // User wants it to just be a square in the background color (#f8fafc)
-    div.style.backgroundColor = "#f8fafc";
-    div.style.border = "1px solid var(--border-light)";
-    grid.appendChild(div);
-  });
-
-  // Render boxes
-  if (level.boxes) {
-    window.activeBoxes = JSON.parse(JSON.stringify(level.boxes));
-    window.activeBoxes.forEach((box, idx) => {
-      const div = document.createElement("div");
-      div.className = "grid-box";
-      div.id = `box-${idx}`;
-      div.style.gridColumn = box.x + 1;
-      div.style.gridRow = box.y + 1;
-      div.innerHTML = `<img src="imges/box.png" alt="Box" />`;
-      grid.appendChild(div);
+    // Walls
+    level.walls.forEach(wall => {
+      this.createGridElement("grid-wall", wall.x, wall.y, {
+        backgroundColor: "#f8fafc",
+        border: "1px solid var(--border-light)"
+      });
     });
-  } else {
-    window.activeBoxes = [];
-  }
 
-  // Render goal
-  const goalDiv = document.createElement("div");
-  goalDiv.className = "grid-goal";
-  goalDiv.id = "level-goal";
-  goalDiv.style.gridColumn = level.goal.x + 1;
-  goalDiv.style.gridRow = level.goal.y + 1;
-  if (level.goal.locked) {
-    goalDiv.innerHTML = `<img src="imges/looked.png" alt="Locked Door" />`;
-    goalDiv.classList.add("locked");
-  } else {
-    goalDiv.innerHTML = `<img src="imges/door.png" alt="Door" />`;
-  }
-  grid.appendChild(goalDiv);
+    // Boxes
+    window.GridX.State.activeBoxes = JSON.parse(JSON.stringify(level.boxes || []));
+    window.GridX.State.activeBoxes.forEach((box, i) => {
+      const div = this.createGridElement("grid-box", box.x, box.y);
+      div.id = `box-${i}`;
+      div.innerHTML = `<img src="imges/box.png" alt="Box" />`;
+    });
 
-  // Render collectible items
-  level.items.forEach((item, idx) => {
-    const div = document.createElement("div");
-    div.className = "grid-item";
-    div.dataset.itemIndex = idx;
-    div.dataset.itemType = item.type;
-    div.style.gridColumn = item.x + 1;
-    div.style.gridRow = item.y + 1;
-    if (item.type === "key") {
-      div.innerHTML = `<img src="imges/key.png" alt="Key" />`;
-    }
-    grid.appendChild(div);
-  });
-
-  // Update UI
-  window.updatePlayerPosition();
-  window.updateLevelUI(level);
-
-  // Clear editor hint
-  if (window.editor) {
-    window.editor.setValue("// " + level.description + "\n");
-  }
-
-  window.clearLog();
-  window.log(`Level ${level.id}: ${level.title}`, "info");
-  window.log(level.description, "info");
-};
-
-// Update header/UI with level info
-window.updateLevelUI = function (level) {
-  const levelTitle = document.getElementById("level-title");
-  const levelDesc = document.getElementById("level-desc");
-  const levelNum = document.getElementById("level-num");
-  const hintBtn = document.getElementById("hint-btn");
-
-  if (levelTitle) levelTitle.textContent = level.id + " - " + level.title;
-  if (levelDesc) levelDesc.textContent = level.description;
-  if (levelNum) levelNum.textContent = `${level.id} / ${window.LEVELS.length}`;
-
-  // Update level selector active state
-  document.querySelectorAll(".level-dot").forEach((dot, i) => {
-    dot.classList.toggle("active", i === window.currentLevel);
-    dot.classList.toggle("completed", i < window.currentLevel);
-  });
-};
-
-// Check if player reached goal
-window.checkWinCondition = function () {
-  const level = window.LEVELS[window.currentLevel];
-  if (!level) return false;
-
-  const atGoal =
-    window.playerPos.x === level.goal.x && window.playerPos.y === level.goal.y;
-
-  if (!atGoal) return false;
-
-  // If goal is locked, check if it was unlocked manually by open()
-  if (level.goal.locked && !window.doorUnlocked) {
-    window.log("The door is locked! Use player.open('door') when near and you have a key.", "error");
-    return false;
-  }
-
-  return true;
-};
-
-// Auto item pickup is disabled because user wants manual `player.take("key")`
-window.checkItemPickup = function () {
-  // Logic moved to `player.take()`
-};
-
-// Check if a wall is at position
-window.isWall = function (x, y) {
-  const level = window.LEVELS[window.currentLevel];
-  if (!level) return false;
-  return level.walls.some((w) => w.x === x && w.y === y);
-};
-
-// Check if a box is at position
-window.isBoxAt = function (x, y) {
-  if (!window.activeBoxes) return false;
-  return window.activeBoxes.some((b) => b.x === x && b.y === y);
-};
-
-// Win celebration & next level
-window.winLevel = function () {
-  const playerImg = window.PLAYER_ELEM.querySelector("img");
-  if (playerImg) {
-    playerImg.src = "imges/player-win.png";
-  }
-
-  window.log("🎉 Level Complete!", "success");
-
-  const nextIndex = window.currentLevel + 1;
-  const overlay = document.getElementById("win-overlay");
-  const winMsg = document.getElementById("win-message");
-  const nextBtn = document.getElementById("next-level-overlay-btn");
-
-  if (overlay) {
-    if (nextIndex < window.LEVELS.length) {
-      if (winMsg) winMsg.textContent = `Ready for Level ${nextIndex + 1}?`;
-      if (nextBtn) nextBtn.textContent = "Next Level";
-      if (nextBtn) nextBtn.style.display = "";
+    // Goal
+    const goalDiv = this.createGridElement("grid-goal", level.goal.x, level.goal.y);
+    goalDiv.id = "level-goal";
+    if (level.goal.locked) {
+      goalDiv.innerHTML = `<img src="imges/looked.png" alt="Locked Door" />`;
+      goalDiv.classList.add("locked");
     } else {
-      if (winMsg) winMsg.textContent = "🏆 You completed all levels!";
-      if (nextBtn) nextBtn.style.display = "none";
+      goalDiv.innerHTML = `<img src="imges/door.png" alt="Door" />`;
     }
-    setTimeout(() => {
-      overlay.classList.add("active");
-    }, 600);
+
+    // Items
+    level.items.forEach((item, i) => {
+      const div = this.createGridElement("grid-item", item.x, item.y);
+      div.dataset.itemIndex = i;
+      div.dataset.itemType = item.type;
+      if (item.type === "key") div.innerHTML = `<img src="imges/key.png" alt="Key" />`;
+    });
+  },
+
+  createGridElement(className, x, y, styles = {}) {
+    const div = document.createElement("div");
+    div.className = className;
+    div.style.gridColumn = x + 1;
+    div.style.gridRow = y + 1;
+    Object.assign(div.style, styles);
+    window.GridX.DOM.grid.appendChild(div);
+    return div;
+  },
+
+  updateLevelUI(level) {
+    const { DOM, State } = window.GridX;
+    if (DOM.levelTitle) DOM.levelTitle.textContent = `${level.id} - ${level.title}`;
+    if (DOM.levelDesc) DOM.levelDesc.textContent = level.description;
+    if (DOM.levelNum) DOM.levelNum.textContent = `${level.id} / ${State.levels.length}`;
+
+    document.querySelectorAll(".level-dot").forEach((dot, i) => {
+      dot.classList.toggle("active", i === State.currentLevelIndex);
+      dot.classList.toggle("completed", i < State.currentLevelIndex);
+    });
+  },
+
+  // --- Grid Utilities ---
+  isWall(x, y) {
+    const level = window.GridX.State.levels[window.GridX.State.currentLevelIndex];
+    return level?.walls.some(w => w.x === x && w.y === y);
+  },
+
+  isBoxAt(x, y) {
+    return window.GridX.State.activeBoxes.some(b => b.x === x && b.y === y);
+  },
+
+  getBoxIndexAt(x, y) {
+    return window.GridX.State.activeBoxes.findIndex(b => b.x === x && b.y === y);
+  },
+
+  isValidPosition(x, y) {
+    const size = window.GridX.State.gridSize;
+    return x >= 0 && x < size && y >= 0 && y < size;
   }
 };
 
-// Navigate levels
-window.nextLevel = function () {
-  if (window.currentLevel < window.LEVELS.length - 1) {
-    window.loadLevel(window.currentLevel + 1);
-  }
-};
-
-window.prevLevel = function () {
-  if (window.currentLevel > 0) {
-    window.loadLevel(window.currentLevel - 1);
-  }
-};
-
-// Show hint
-window.showHint = function () {
-  const level = window.LEVELS[window.currentLevel];
-  if (!level) return;
-  window.log("💡 Hint: " + level.hint, "info");
+// Backward compatibility (optional, but safer during refactor)
+window.initLevels = window.GridX.LevelManager.init.bind(window.GridX.LevelManager);
+window.loadLevel = window.GridX.LevelManager.loadLevel.bind(window.GridX.LevelManager);
+window.loadProgress = window.GridX.LevelManager.loadProgress.bind(window.GridX.LevelManager);
+window.prevLevel = () => window.GridX.LevelManager.loadLevel(window.GridX.State.currentLevelIndex - 1);
+window.nextLevel = () => window.GridX.LevelManager.loadLevel(window.GridX.State.currentLevelIndex + 1);
+window.isWall = window.GridX.LevelManager.isWall.bind(window.GridX.LevelManager);
+window.isBoxAt = window.GridX.LevelManager.isBoxAt.bind(window.GridX.LevelManager);
+window.showHint = () => {
+  const level = window.GridX.State.levels[window.GridX.State.currentLevelIndex];
+  if (level) window.GridX.Logger.log("💡 Hint: " + level.hint, "info");
 };

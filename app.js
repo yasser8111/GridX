@@ -6,66 +6,52 @@
 
 (function () {
   async function init() {
-    // Setup UI first (CodeMirror, buttons, etc.)
-    if (window.setupUI) {
-      window.setupUI();
-    }
+    const { UI, LevelManager, DOM, State } = window.GridX;
+
+    // 1. Setup UI (CodeMirror, buttons, etc.)
+    if (UI) UI.init();
     
-    // Fetch levels JSON
-    if (window.initLevels) {
-      await window.initLevels();
-    }
+    // 2. Load levels from JSON
+    if (LevelManager) await LevelManager.init();
 
-    // Load saved progress
-    if (window.loadProgress) {
-      window.loadProgress();
-    }
+    // 3. Load saved progress
+    if (LevelManager) LevelManager.loadProgress();
 
-    // Generate level dots
+    // 4. Generate level dots
     const dotsContainer = document.getElementById("level-dots");
-    if (dotsContainer && window.LEVELS) {
-      window.LEVELS.forEach((level, i) => {
+    if (dotsContainer && State.levels) {
+      State.levels.forEach((level, i) => {
         const dot = document.createElement("button");
         dot.className = "level-dot";
         dot.title = `Level ${level.id}: ${level.title}`;
-        dot.addEventListener("click", () => {
-          window.loadLevel(i);
-        });
+        dot.addEventListener("click", () => LevelManager.loadLevel(i));
         dotsContainer.appendChild(dot);
       });
     }
 
-    // Level nav buttons
-    const prevBtn = document.getElementById("prev-level-btn");
-    const nextBtn = document.getElementById("next-level-btn");
-    const hintBtn = document.getElementById("hint-btn");
-    const nextOverlay = document.getElementById("next-level-overlay-btn");
+    // 5. Global Actions
+    const binds = [
+        { id: "prev-level-btn", action: window.prevLevel },
+        { id: "next-level-btn", action: window.nextLevel },
+        { id: "hint-btn", action: window.showHint }
+    ];
 
-    if (prevBtn) prevBtn.addEventListener("click", window.prevLevel);
-    if (nextBtn) nextBtn.addEventListener("click", window.nextLevel);
-    if (hintBtn) hintBtn.addEventListener("click", window.showHint);
-    if (nextOverlay) {
-      nextOverlay.addEventListener("click", () => {
-        document.getElementById("win-overlay").classList.remove("active");
-        window.nextLevel();
-      });
-    }
+    binds.forEach(bind => {
+        const el = document.getElementById(bind.id);
+        if (el) el.addEventListener("click", bind.action);
+    });
 
-    const winOverlay = document.getElementById("win-overlay");
+    const winOverlay = DOM.winOverlay;
     if (winOverlay) {
       winOverlay.addEventListener("click", (e) => {
-        if (e.target === winOverlay) {
-          winOverlay.classList.remove("active");
-        }
+        if (e.target === winOverlay) winOverlay.classList.remove("active");
       });
     }
 
-    // Load the current level
-    if (window.loadLevel) {
-      window.loadLevel(window.currentLevel || 0);
-    }
+    // 6. Start the game!
+    if (LevelManager) LevelManager.loadLevel(State.currentLevelIndex || 0);
 
-    console.log("GridX initialized with levels system.");
+    console.log("GridX Core initialized.");
   }
 
   if (document.readyState === "loading") {

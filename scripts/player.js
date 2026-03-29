@@ -1,320 +1,290 @@
-// Player State & API Module
-window.playerPos = { x: 0, y: 0 };
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+/**
+ * GridX Player Control System
+ * --------------------------
+ * Core logic for player movement, collision detection, and interaction.
+ */
 
-window.updatePlayerPosition = function () {
-  if (!window.PLAYER_ELEM) return;
-  const cellSize =
-    parseInt(
-      getComputedStyle(document.documentElement).getPropertyValue(
-        "--cell-size",
-      ),
-    ) || 60;
-  window.PLAYER_ELEM.style.transform = `translate(${window.playerPos.x * cellSize}px, ${window.playerPos.y * cellSize}px)`;
-};
+window.GridX.PlayerControl = {
+  // --- Movement Internal Helpers ---
+  sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); },
 
-window.resetPlayer = function () {
-  if (!window.PLAYER_ELEM) return;
+  updateView() {
+    const { DOM, State } = window.GridX;
+    if (!DOM.player) return;
 
-  // Restore happy player image
-  const playerImg = window.PLAYER_ELEM.querySelector("img");
-  if (playerImg) {
-    playerImg.src = "imges/player-smail.png";
-  }
+    const cellSize = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--cell-size")) || 60;
+    DOM.player.style.transform = `translate(${State.playerPos.x * cellSize}px, ${State.playerPos.y * cellSize}px)`;
+  },
 
-  // Temporarily disable transition for instant snap-back
-  const originalTransition = window.PLAYER_ELEM.style.transition;
-  window.PLAYER_ELEM.style.transition = "none";
+  resetRepresentation() {
+    this.updateView();
+    // Happy player img
+    const img = window.GridX.DOM.player?.querySelector("img");
+    if (img) img.src = "imges/player-smail.png";
+  },
 
-  // Reset to level start position
-  const level = window.LEVELS ? window.LEVELS[window.currentLevel] : null;
-  if (level) {
-    window.playerPos = { x: level.start.x, y: level.start.y };
-  } else {
-    window.playerPos = { x: 0, y: 0 };
-  }
-  window.updatePlayerPosition();
+  resetPlayer() {
+    const { State, DOM, LevelManager } = window.GridX;
+    const level = State.levels[State.currentLevelIndex];
+    if (!level) return;
 
-  // Force reflow/repaint
-  window.PLAYER_ELEM.offsetHeight;
+    this.resetRepresentation();
 
-  // Restore transition
-  window.PLAYER_ELEM.style.transition = originalTransition;
+    // Snap back instantly
+    const originalTransition = DOM.player.style.transition;
+    DOM.player.style.transition = "none";
+    State.playerPos = { ...level.start };
+    this.updateView();
+    DOM.player.offsetHeight; // Force reflow
+    DOM.player.style.transition = originalTransition;
 
-  // Reset collected items
-  window.collectedItems = [];
+    // reset items
+    State.collectedItems = [];
+    document.querySelectorAll(".grid-item").forEach(el => {
+      el.style.opacity = "1";
+      el.style.transform = "scale(1)";
+    });
 
-  // Restore items visibility
-  document.querySelectorAll(".grid-item").forEach((el) => {
-    el.style.opacity = "1";
-    el.style.transform = "scale(1)";
-  });
-
-  // Re-lock door if needed
-  const level2 = window.LEVELS ? window.LEVELS[window.currentLevel] : null;
-  if (level2 && level2.goal.locked) {
-    const goalEl = document.getElementById("level-goal");
-    if (goalEl) {
-      goalEl.innerHTML = `<img src="imges/looked.png" alt="Locked Door" />`;
-      goalEl.classList.add("locked");
-      window.doorUnlocked = false;
+    // reset door
+    if (level.goal.locked) {
+      const goalEl = document.getElementById("level-goal");
+      if (goalEl) {
+        goalEl.innerHTML = `<img src="imges/looked.png" alt="Locked Door" />`;
+        goalEl.classList.add("locked");
+        State.doorUnlocked = false;
+      }
     }
-  }
 
-  // Reset boxes
-  if (level2 && level2.boxes) {
-    window.activeBoxes = JSON.parse(JSON.stringify(level2.boxes));
-    window.activeBoxes.forEach((box, idx) => {
-      const el = document.getElementById(`box-${idx}`);
+    // reset boxes
+    State.activeBoxes = JSON.parse(JSON.stringify(level.boxes || []));
+    State.activeBoxes.forEach((box, i) => {
+      const el = document.getElementById(`box-${i}`);
       if (el) {
         el.style.gridColumn = box.x + 1;
         el.style.gridRow = box.y + 1;
       }
     });
-  } else {
-    window.activeBoxes = [];
-  }
-};
+  },
 
-window.stopExecution = false;
-
-function checkStop() {
-  if (window.stopExecution) {
-    throw new Error("STOPPED_BY_USER");
-  }
-}
-
-window.canMove = function (dir) {
-  const d = dir?.charAt(0).toLowerCase();
-  const moves = { r: [1, 0], l: [-1, 0], d: [0, 1], u: [0, -1] };
-
-  if (!moves[d]) return false;
-
-  const [dx, dy] = moves[d];
-  const nx = window.playerPos.x + dx;
-  const ny = window.playerPos.y + dy;
-
-  // Check grid boundaries
-  if (nx < 0 || nx >= window.GRID_SIZE || ny < 0 || ny >= window.GRID_SIZE) {
-    return false;
-  }
-
-  // Check walls
-  if (window.isWall && window.isWall(nx, ny)) {
-    return false;
-  }
-  
-  if (window.isBoxAt && window.isBoxAt(nx, ny)) {
-    return false;
-  }
-
-  return true;
-};
-
-window.player = {
-  async move(dir) {
-    checkStop();
-    const d = dir?.charAt(0).toLowerCase();
+  // --- Core API Methods ---
+  canMove(dir) {
     const moves = { r: [1, 0], l: [-1, 0], d: [0, 1], u: [0, -1] };
-
-    if (!moves[d]) return window.log("Error", "error");
+    const d = dir?.charAt(0).toLowerCase();
+    if (!moves[d]) return false;
 
     const [dx, dy] = moves[d];
-    const nx = window.playerPos.x + dx;
-    const ny = window.playerPos.y + dy;
+    const { State, LevelManager } = window.GridX;
+    const nx = State.playerPos.x + dx;
+    const ny = State.playerPos.y + dy;
 
-    // Check boundaries
-    if (nx < 0 || nx >= window.GRID_SIZE || ny < 0 || ny >= window.GRID_SIZE) {
-      const playerImg = window.PLAYER_ELEM.querySelector("img");
-      if (playerImg) {
-        playerImg.src = "imges/player-lost.png";
-      }
-      window.stopExecution = true;
-      throw new Error("CRASHED_INTO_WALL");
+    return LevelManager.isValidPosition(nx, ny) && 
+           !LevelManager.isWall(nx, ny) && 
+           !LevelManager.isBoxAt(nx, ny);
+  },
+
+  async move(dir) {
+    this.checkStop();
+    const moves = { r: [1, 0], l: [-1, 0], d: [0, 1], u: [0, -1] };
+    const d = dir?.charAt(0).toLowerCase();
+    if (!moves[d]) {
+        window.GridX.Logger.log("Invalid move direction.", "error");
+        return;
     }
 
-    // Check walls
-    if (window.isWall && window.isWall(nx, ny)) {
-      const playerImg = window.PLAYER_ELEM.querySelector("img");
-      if (playerImg) {
-        playerImg.src = "imges/player-lost.png";
-      }
-      window.log("💥 Crashed into a wall!", "error");
-      window.stopExecution = true;
-      throw new Error("CRASHED_INTO_WALL");
+    const [dx, dy] = moves[d];
+    const { State, LevelManager } = window.GridX;
+    const nx = State.playerPos.x + dx;
+    const ny = State.playerPos.y + dy;
+
+    // Detect collision/out of bounds
+    if (!LevelManager.isValidPosition(nx, ny) || LevelManager.isWall(nx, ny) || LevelManager.isBoxAt(nx, ny)) {
+      this.handleCrash(LevelManager.isWall(nx, ny) ? "WALL" : LevelManager.isBoxAt(nx, ny) ? "BOX" : "BOUNDARY");
+      throw new Error("CRASHED");
     }
 
-    // Check boxes
-    if (window.isBoxAt && window.isBoxAt(nx, ny)) {
-      const playerImg = window.PLAYER_ELEM.querySelector("img");
-      if (playerImg) {
-        playerImg.src = "imges/player-lost.png";
-      }
-      window.log("💥 Crashed into a box!", "error");
-      window.stopExecution = true;
-      throw new Error("CRASHED_INTO_BOX");
-    }
-
-    window.playerPos.x = nx;
-    window.playerPos.y = ny;
-    window.updatePlayerPosition();
-
-    await sleep(window.ANIMATION_SPEED);
+    State.playerPos = { x: nx, y: ny };
+    this.updateView();
+    await this.sleep(window.GridX.Config.animationSpeed);
   },
 
   async run(dir) {
-    checkStop();
     await this.move(dir);
     await this.move(dir);
   },
 
   async take(itemName) {
-    checkStop();
-    const level = window.LEVELS[window.currentLevel];
+    this.checkStop();
+    const { State, LevelManager } = window.GridX;
+    const level = State.levels[State.currentLevelIndex];
     if (!level) return;
 
-    let found = false;
-    level.items.forEach((item, idx) => {
-      // Check if we are on the same cell and item matches
-      if (item.type === itemName && window.playerPos.x === item.x && window.playerPos.y === item.y && !window.collectedItems.includes(item.type)) {
-        window.collectedItems.push(item.type);
-        const el = document.querySelector(`.grid-item[data-item-index="${idx}"]`);
-        if (el) {
-          el.style.opacity = "0";
-          el.style.transform = "scale(0)";
-        }
-        window.log(`Picked up: ${item.type}!`, "success");
-        found = true;
-      }
-    });
-
-    if (!found) {
-      window.log(`No ${itemName} here to take.`, "error");
-    }
-    await sleep(window.ANIMATION_SPEED);
-  },
-
-  async open(targetName) {
-    checkStop();
-    const level = window.LEVELS[window.currentLevel];
-    if (!level) return;
-
-    if ((targetName === "locked" || targetName === "door") && level.goal.locked) {
-      const atOrNearGoal = Math.abs(window.playerPos.x - level.goal.x) <= 1 && Math.abs(window.playerPos.y - level.goal.y) <= 1;
-      
-      if (atOrNearGoal) {
-        if (window.collectedItems.includes("key")) {
-          const goalEl = document.getElementById("level-goal");
-          if (goalEl && goalEl.classList.contains("locked")) {
-            goalEl.innerHTML = `<img src="imges/door.png" alt="Door" />`;
-            goalEl.classList.remove("locked");
-            window.doorUnlocked = true;
-            window.log("Unlocked the door!", "success");
-          } else {
-            window.log("Door is already open.", "info");
-          }
-        } else {
-          window.log("You need a key to open this!", "error");
-        }
-      } else {
-         window.log("You are not close enough to the door!", "error");
-      }
+    const itemIdx = level.items.findIndex(it => it.type === itemName && it.x === State.playerPos.x && it.y === State.playerPos.y);
+    
+    if (itemIdx !== -1 && !State.collectedItems.includes(itemName)) {
+        State.collectedItems.push(itemName);
+        const el = document.querySelector(`.grid-item[data-item-index="${itemIdx}"]`);
+        if (el) { el.style.opacity = "0"; el.style.transform = "scale(0)"; }
+        window.GridX.Logger.log(`Picked up: ${itemName}!`, "success");
     } else {
-      window.log(`Cannot open ${targetName}.`, "error");
+        window.GridX.Logger.log(`No ${itemName} here to take.`, "error");
     }
-    await sleep(window.ANIMATION_SPEED);
+    await this.sleep(window.GridX.Config.animationSpeed);
   },
 
-  async push(targetName) {
-    checkStop();
-    if (targetName !== "box") {
-        window.log("You can only push boxes.", "error");
-        return;
-    }
-    if (!window.activeBoxes || window.activeBoxes.length === 0) {
-        window.log("No boxes available to push.", "error"); return;
-    }
-
-    // Find first adjacent box
-    let boxIndex = -1, dX = 0, dY = 0;
-    for(let i = 0; i < window.activeBoxes.length; i++) {
-        let b = window.activeBoxes[i];
-        if (Math.abs(b.x - window.playerPos.x) + Math.abs(b.y - window.playerPos.y) === 1) {
-             boxIndex = i;
-             dX = b.x - window.playerPos.x;
-             dY = b.y - window.playerPos.y;
-             break;
+  async open(target) {
+    this.checkStop();
+    const { State, LevelManager } = window.GridX;
+    const level = State.levels[State.currentLevelIndex];
+    
+    if ((target === "door" || target === "locked") && level.goal.locked) {
+        const dist = Math.abs(State.playerPos.x - level.goal.x) + Math.abs(State.playerPos.y - level.goal.y);
+        if (dist <= 1 && State.collectedItems.includes("key")) {
+            const goalEl = document.getElementById("level-goal");
+            if (goalEl) {
+                goalEl.innerHTML = `<img src="imges/door.png" alt="Door" />`;
+                goalEl.classList.remove("locked");
+                State.doorUnlocked = true;
+                window.GridX.Logger.log("Unlocked the door!", "success");
+            }
+        } else {
+            window.GridX.Logger.log(dist > 1 ? "Not close enough to door!" : "Need a key!", "error");
         }
     }
-    
-    if (boxIndex === -1) {
-         window.log("No box nearby to push!", "error"); return;
-    }
-
-    let nX = window.activeBoxes[boxIndex].x + dX;
-    let nY = window.activeBoxes[boxIndex].y + dY;
-
-    if (nX < 0 || nY < 0 || nX >= window.GRID_SIZE || nY >= window.GRID_SIZE || window.isWall(nX, nY) || window.isBoxAt(nX, nY)) {
-         window.log("Box is blocked!", "error"); return;
-    }
-
-    window.activeBoxes[boxIndex].x = nX;
-    window.activeBoxes[boxIndex].y = nY;
-    const el = document.getElementById(`box-${boxIndex}`);
-    if (el) {
-        el.style.gridColumn = nX + 1;
-        el.style.gridRow = nY + 1;
-    }
-    window.log("Pushed box", "success");
-    await sleep(window.ANIMATION_SPEED);
+    await this.sleep(window.GridX.Config.animationSpeed);
   },
 
-  async pull(targetName) {
-    checkStop();
-    if (targetName !== "box") {
-        window.log("You can only pull boxes.", "error");
-        return;
-    }
+  async pushBox(target) {
+    this.checkStop();
+    const { State, LevelManager } = window.GridX;
     
-    let boxIndex = -1, dX = 0, dY = 0;
-    for(let i = 0; i < window.activeBoxes.length; i++) {
-        let b = window.activeBoxes[i];
-        if (Math.abs(b.x - window.playerPos.x) + Math.abs(b.y - window.playerPos.y) === 1) {
-             boxIndex = i;
-             dX = b.x - window.playerPos.x;
-             dY = b.y - window.playerPos.y;
-             break;
+    for (let i = 0; i < State.activeBoxes.length; i++) {
+        const b = State.activeBoxes[i];
+        const dx = b.x - State.playerPos.x;
+        const dy = b.y - State.playerPos.y;
+
+        if (Math.abs(dx) + Math.abs(dy) === 1) { // adjacent
+            const oldBoxPos = { x: b.x, y: b.y };
+            const nx = b.x + dx;
+            const ny = b.y + dy;
+
+            if (LevelManager.isValidPosition(nx, ny) && !LevelManager.isWall(nx, ny) && !LevelManager.isBoxAt(nx, ny)) {
+                // Move Player forward to original box position
+                State.playerPos = { x: oldBoxPos.x, y: oldBoxPos.y };
+                this.updateView();
+
+                // Move Box forward
+                b.x = nx; b.y = ny;
+                const el = document.getElementById(`box-${i}`);
+                if (el) { el.style.gridColumn = nx + 1; el.style.gridRow = ny + 1; }
+                
+                window.GridX.Logger.log("Pushed box", "success");
+                await this.sleep(window.GridX.Config.animationSpeed);
+                return;
+            }
         }
     }
-    
-    if (boxIndex === -1) {
-         window.log("No box nearby to pull!", "error"); return;
-    }
+    window.GridX.Logger.log("No box nearby to push or path blocked.", "error");
+    await this.sleep(window.GridX.Config.animationSpeed);
+  },
 
-    let newPx = window.playerPos.x - dX;
-    let newPy = window.playerPos.y - dY;
-    let newBx = window.playerPos.x;
-    let newBy = window.playerPos.y;
+  async pullBox(target) {
+    this.checkStop();
+    const { State, LevelManager } = window.GridX;
+    
+    for (let i = 0; i < State.activeBoxes.length; i++) {
+        const b = State.activeBoxes[i];
+        const dx = b.x - State.playerPos.x;
+        const dy = b.y - State.playerPos.y;
 
-    if (newPx < 0 || newPy < 0 || newPx >= window.GRID_SIZE || newPy >= window.GRID_SIZE || window.isWall(newPx, newPy) || window.isBoxAt(newPx, newPy)) {
-         window.log("Cannot pull, something is blocking you behind!", "error"); return;
+        if (Math.abs(dx) + Math.abs(dy) === 1) { // adjacent
+            const nPx = State.playerPos.x - dx;
+            const nPy = State.playerPos.y - dy;
+            const nBx = State.playerPos.x;
+            const nBy = State.playerPos.y;
+
+            if (LevelManager.isValidPosition(nPx, nPy) && !LevelManager.isWall(nPx, nPy) && !LevelManager.isBoxAt(nPx, nPy)) {
+                State.playerPos = { x: nPx, y: nPy };
+                b.x = nBx; b.y = nBy;
+                this.updateView();
+                const el = document.getElementById(`box-${i}`);
+                if (el) { el.style.gridColumn = nBx + 1; el.style.gridRow = nBy + 1; }
+                window.GridX.Logger.log("Pulled box", "success");
+                await this.sleep(window.GridX.Config.animationSpeed);
+                return;
+            }
+        }
     }
-    
-    // Move player
-    window.playerPos.x = newPx;
-    window.playerPos.y = newPy;
-    window.updatePlayerPosition();
-    
-    // Move box
-    window.activeBoxes[boxIndex].x = newBx;
-    window.activeBoxes[boxIndex].y = newBy;
-    const el = document.getElementById(`box-${boxIndex}`);
-    if (el) {
-        el.style.gridColumn = newBx + 1;
-        el.style.gridRow = newBy + 1;
-    }
-    
-    window.log("Pulled box", "success");
-    await sleep(window.ANIMATION_SPEED);
+    window.GridX.Logger.log("Cannot pull any box from here.", "error");
+    await this.sleep(window.GridX.Config.animationSpeed);
+  },
+
+  // --- Runtime Support ---
+  checkStop() {
+    if (window.GridX.State.stopExecution) throw new Error("STOPPED_BY_USER");
+  },
+
+  handleCrash(type) {
+    const img = window.GridX.DOM.player?.querySelector("img");
+    if (img) img.src = "imges/player-lost.png";
+    window.GridX.State.stopExecution = true;
+    window.GridX.Logger.log(`💥 CRASH! You hit ${type}.`, "error");
   }
+};
+
+// Global Exposure (Same behavior for user code)
+window.canMove = window.GridX.PlayerControl.canMove.bind(window.GridX.PlayerControl);
+window.player = {
+  move: window.GridX.PlayerControl.move.bind(window.GridX.PlayerControl),
+  run: window.GridX.PlayerControl.run.bind(window.GridX.PlayerControl),
+  take: window.GridX.PlayerControl.take.bind(window.GridX.PlayerControl),
+  open: window.GridX.PlayerControl.open.bind(window.GridX.PlayerControl),
+  push: window.GridX.PlayerControl.pushBox.bind(window.GridX.PlayerControl),
+  pull: window.GridX.PlayerControl.pullBox.bind(window.GridX.PlayerControl)
+};
+
+// Internal shortcuts
+window.updatePlayerPosition = window.GridX.PlayerControl.updateView.bind(window.GridX.PlayerControl);
+window.resetPlayer = window.GridX.PlayerControl.resetPlayer.bind(window.GridX.PlayerControl);
+window.checkWinCondition = () => {
+  const { State, LevelManager } = window.GridX;
+  const level = State.levels[State.currentLevelIndex];
+  if (!level) return false;
+
+  const atGoal = State.playerPos.x === level.goal.x && State.playerPos.y === level.goal.y;
+  if (!atGoal) return false;
+  if (level.goal.locked && !State.doorUnlocked) {
+    window.GridX.Logger.log("Door locked! Unlock it first.", "error");
+    return false;
+  }
+  return true;
+};
+window.winLevel = () => {
+    const img = window.GridX.DOM.player?.querySelector("img");
+    if (img) img.src = "imges/player-win.png";
+    window.GridX.Logger.log("🎉 Level Complete!", "success");
+
+    const overlay = window.GridX.DOM.winOverlay;
+    if (overlay) {
+        const nextIndex = window.GridX.State.currentLevelIndex + 1;
+        const msg = document.getElementById("win-message");
+        const btn = document.getElementById("next-level-overlay-btn");
+
+        if (nextIndex < window.GridX.State.levels.length) {
+            msg.textContent = `Ready for Level ${nextIndex + 1}?`;
+            btn.textContent = "Next Level";
+            btn.style.display = "";
+            btn.onclick = () => {
+                overlay.classList.remove("active");
+                window.nextLevel();
+            };
+        } else {
+            msg.textContent = "🏆 Master of GridX! All challenges completed.";
+            btn.textContent = "View Final Reward";
+            btn.style.display = "";
+            btn.onclick = () => {
+                window.location.href = "congratulations.html";
+            };
+        }
+        setTimeout(() => overlay.classList.add("active"), 600);
+    }
 };

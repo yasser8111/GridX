@@ -1,15 +1,31 @@
-// Logger Module
-window.log = function(message, type = 'info') {
-    if (!window.OUTPUT_LOG) return;
+/**
+ * GridX Logger System
+ * -------------------
+ * Handles console-like output to the terminal element.
+ */
+
+window.GridX.Logger = {
+  log(message, type = 'info') {
+    const output = window.GridX.DOM.outputLog;
+    if (!output) return;
+
     const p = document.createElement('p');
     p.className = `log-${type}`;
     p.innerText = `> ${message}`;
-    window.OUTPUT_LOG.appendChild(p);
-    window.OUTPUT_LOG.scrollTop = window.OUTPUT_LOG.scrollHeight;
+    
+    output.appendChild(p);
+    output.scrollTop = output.scrollHeight;
+    
+    // Also log to browser console for developer convenience
+    if (type === 'error') console.error(message);
+  },
+
+  clear() {
+    const output = window.GridX.DOM.outputLog;
+    if (output) output.innerHTML = '';
+  }
 };
 
-window.clearLog = function() {
-    if (window.OUTPUT_LOG) {
-        window.OUTPUT_LOG.innerHTML = '';
-    }
-};
+// Global shortcuts for easier internal calling
+window.log = window.GridX.Logger.log;
+window.clearLog = window.GridX.Logger.clear;

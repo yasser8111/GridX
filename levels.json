@@ -87,7 +87,7 @@
     "id": 7,
     "title": "Heavy Lifting",
     "description": "A heavy box blocks your path. Stand next to it and use player.push('box') to clear the way!",
-    "hint": "player.run('right');\nplayer.push('box');\nplayer.run('right');",
+    "hint": "player.move('right');\nplayer.push('box');\nplayer.run('right');",
     "gridSize": 6,
     "start": { "x": 0, "y": 2 },
     "goal": { "x": 5, "y": 2, "locked": false },
@@ -121,7 +121,7 @@
     "id": 9,
     "title": "Smart Navigation",
     "description": "You don't know where the wall is! Use canMove() inside if/else inside a loop.",
-    "hint": "for(5) {\n  if (canMove('right')) {\n    player.move('right');\n  } else {\n    player.move('down');\n    player.move('right');\n    player.move('up');\n  }\n}",
+    "hint": "for(5) {\n  if (canMove('right')) {\n    player.move('right');\n  } else {\n    player.move('down');\n    player.run('right');\n    player.move('up');\n  }\n}",
     "gridSize": 6,
     "start": { "x": 0, "y": 2 },
     "goal": { "x": 5, "y": 2, "locked": false },
@@ -153,7 +153,7 @@
     "id": 11,
     "title": "The Collector's Puzzle",
     "description": "Combine your skills! Find a way to grab the key, push the box out of the way, and unlock the door.",
-    "hint": "player.move('u'); player.move('r'); player.take('key');\nplayer.push('box');\nplayer.move('d');\nplayer.run('r');\nplayer.open('door');",
+    "hint": "player.move('up'); player.move('right'); player.take('key');\nplayer.push('box');\nplayer.run('right');\nplayer.move('right');\nplayer.open('door');",
     "gridSize": 6,
     "start": { "x": 1, "y": 2 },
     "goal": { "x": 5, "y": 2, "locked": true },
@@ -182,23 +182,21 @@
     "start": { "x": 0, "y": 6 },
     "goal": { "x": 6, "y": 0, "locked": true },
     "walls": [
-      { "x": 0, "y": 5 },
       { "x": 1, "y": 5 },
       { "x": 3, "y": 6 },
       { "x": 3, "y": 5 },
       { "x": 3, "y": 4 },
       { "x": 3, "y": 3 },
-      { "x": 4, "y": 3 },
-      { "x": 4, "y": 2 },
-      { "x": 1, "y": 1 }
+      { "x": 5, "y": 0 },
+      { "x": 5, "y": 1 },
+      { "x": 5, "y": 2 }
     ],
     "items": [
-      { "x": 2, "y": 4, "type": "key" }
+      { "x": 0, "y": 0, "type": "key" }
     ],
     "boxes": [
-      { "x": 0, "y": 3 },
-      { "x": 2, "y": 6 },
-      { "x": 6, "y": 2 }
+      { "x": 2, "y": 5 },
+      { "x": 4, "y": 1 }
     ]
   }
 ]

@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GridX - Game</title>
+    <link rel="icon" type="image/png" href="imges/logo.png" />
+    <meta
+      name="description"
+      content="An interactive coding game where you control your character with code."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=IBM+Plex+Sans+Arabic:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- CodeMirror Styles -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/hint/show-hint.min.css"
+    />
+    <link rel="stylesheet" href="./styles/style.css" />
+    <style>
+      /* Custom Styling for CodeMirror Hinting */
+      .CodeMirror-hints {
+        z-index: 9999;
+        background: #1e293b;
+        border: 1px solid #334155;
+        border-radius: 8px;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+        padding: 5px;
+        font-family: 'Outfit', sans-serif;
+      }
+
+      .CodeMirror-hint {
+        color: #94a3b8;
+        padding: 6px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+
+      li.CodeMirror-hint-active {
+        background: #3b82f6;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <header class="glass shared-header">
+        <button class="menu-toggle" id="menu-toggle">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </button>
+        <div class="header-controls" id="nav-links">
+          <a href="commands.html" class="nav-link">Docs</a>
+          <a href="levels.html" class="nav-link">Levels</a>
+          <a href="about.html" class="nav-link">About</a>
+        </div>
+        <div class="logo">
+          <span class="grid">Grid</span><span class="x">X</span>
+        </div>
+      </header>
+
+      <main class="game-layout">
+        <!-- Game Panel -->
+        <section id="game-panel" class="glass">
+          <div class="game-panel-header">
+            <div class="header-left">
+              <h2 class="level-title" id="level-title">First Steps</h2>
+              <p class="level-desc" id="level-desc">
+                Move right to reach the door!
+              </p>
+            </div>
+            <div class="header-right">
+              <button class="btn btn-hint" id="hint-btn" title="Show Hint">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                  <circle cx="12" cy="12" r="10"></circle>
+                </svg>
+                Hint
+              </button>
+            </div>
+          </div>
+          <div class="grid-container" id="grid">
+            <!-- Grid generated via JS -->
+            <div id="player" class="character">
+              <img
+                src="imges/player-smail.png"
+                alt="Player"
+                width="40"
+                height="40"
+                style="object-fit: contain"
+              />
+            </div>
+          </div>
+        </section>
+
+        <!-- Code Panel -->
+        <section id="code-panel" class="glass">
+          <div class="editor-header">
+            <h3>Console.js</h3>
+            <div
+              class="status-dot"
+              id="fullscreen-toggle"
+              title="Toggle Fullscreen"
+            >
+              <div class="dot"></div>
+              <div class="dot"></div>
+              <div class="dot"></div>
+            </div>
+          </div>
+          <div class="editor-container">
+            <textarea
+              id="code-input"
+              spellcheck="false"
+              placeholder="Write your code here..."
+            ></textarea>
+          </div>
+          <div class="panel-controls">
+            <button id="run-btn" class="btn btn-primary">Run Code</button>
+            <button
+              id="toggle-log-btn"
+              class="btn btn-outline"
+              style="color: #cbd5e1; border-color: #334155"
+            >
+              Terminal
+            </button>
+          </div>
+          <div id="output-log" class="output-log">
+            <p class="log-info">> Ready for commands...</p>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- Win Overlay -->
+    <div class="win-overlay" id="win-overlay">
+      <div class="win-card glass">
+        <div class="win-emoji">🎉</div>
+        <h2>Level Complete!</h2>
+        <p id="win-message">Great job!</p>
+        <button class="btn btn-primary" id="next-level-overlay-btn">
+          Next Level
+        </button>
+      </div>
+    </div>
+
+    <!-- Load Game Modules Sequentially -->
+    <script src="scripts/config.js"></script>
+    <script src="scripts/logger.js"></script>
+    <script src="scripts/nav.js"></script>
+    <script src="scripts/levels.js"></script>
+    <script src="scripts/player.js"></script>
+    <script src="scripts/engine.js"></script>
+
+    <!-- CodeMirror Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/edit/closebrackets.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/hint/show-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/hint/javascript-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.9/beautify.min.js"></script>
+
+    <script src="scripts/ui.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

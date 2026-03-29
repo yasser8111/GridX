@@ -1,87 +1,119 @@
-// Execution Engine Module
-window.isRunning = false;
+/**
+ * GridX Execution Engine
+ * ----------------------
+ * Parsers and executes user code in an async context.
+ */
 
-window.runCode = async function() {
-    if (window.isRunning) {
-        window.stopExecution = true;
-        window.RUN_BTN.innerText = 'Stopping...';
+window.GridX.Engine = {
+  // --- Code Processor ---
+  processCode(code) {
+    let processed = code;
+
+    // 1. Convert simple for(N) loops to standard JS loops
+    let loopId = 0;
+    processed = processed.replace(/for\s*\(\s*([^;{]+)\s*\)\s*\{/g, (match, count) => {
+      const id = loopId++;
+      return `for (let __r${id} = 0; __r${id} < ${count}; __r${id}++) {`;
+    });
+
+    // 2. Wrap player commands with 'await'
+    // This allows users to write 'player.move("right")' instead of 'await player.move("right")'
+    const commands = ["move", "run", "take", "open", "push", "pull"];
+    commands.forEach(cmd => {
+      const regex = new RegExp(`(?<!await\\s+)player\\.${cmd}\\(`, "g");
+      processed = processed.replace(regex, `await player.${cmd}(`);
+    });
+
+    // 3. Convert user functions to 'async function' and 'await' their calls
+    // Note: Simple regex based - won't handle complex scoping but good for gaming.
+    const userFunctions = [...processed.matchAll(/function\s+([a-zA-Z0-9_]+)\s*\(/g)].map(m => m[1]);
+    processed = processed.replace(/function\s+([a-zA-Z0-9_]+)\s*\(/g, "async function $1(");
+    
+    userFunctions.forEach(fn => {
+        const callRegex = new RegExp(`(?<!await\\s+|async\\s+function\\s+)${fn}\\s*\\(`, "g");
+        processed = processed.replace(callRegex, `await ${fn}(`);
+    });
+
+    // Cleanup double await if it happened
+    processed = processed.replace(/await\s+await\s+/g, "await ");
+    processed = processed.replace(/async\s+function\s+await\s+/g, "async function ");
+
+    return processed;
+  },
+
+  // --- Runner ---
+  async run() {
+    const { State, DOM, Logger, PlayerControl } = window.GridX;
+
+    if (State.isRunning) {
+        State.stopExecution = true;
+        DOM.runBtn.innerText = 'Stopping...';
         return;
     }
-    
-    if (!window.CODE_INPUT) return;
-    const code = window.editor ? window.editor.getValue() : window.CODE_INPUT.value;
-    
+
+    const code = window.editor ? window.editor.getValue() : DOM.codeInput.value;
     if (!code.trim()) {
-        window.log('Error: No code to run!', 'error');
+        Logger.log('Error: Code is empty!', 'error');
         return;
     }
 
-    window.isRunning = true;
-    window.stopExecution = false;
-    window.RUN_BTN.innerText = 'Stop Code';
-    window.RUN_BTN.classList.add('btn-danger');
+    // Auto-Format if beautifier is available
+    if (window.js_beautify) {
+       const formatted = window.js_beautify(code, { indent_size: 4, indent_with_tabs: true });
+       if (formatted !== code) {
+           if (window.editor) window.editor.setValue(formatted);
+           else DOM.codeInput.value = formatted;
+       }
+    }
+
+    // Prepare state
+    State.isRunning = true;
+    State.stopExecution = false;
+    DOM.runBtn.innerText = 'Stop';
+    DOM.runBtn.classList.add('btn-danger');
+
+    // Reset game world
+    PlayerControl.resetPlayer();
+    Logger.clear();
+    Logger.log('Executing code...', 'info');
     
-    // Reset player to level start
-    window.resetPlayer(); 
-    
-    window.clearLog();
-    window.log('Executing code...', 'info');
-    
-    const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-    await sleep(300);
+    // Give the player a moment to settle at the start
+    await PlayerControl.sleep(300);
 
     try {
-        let processedCode = code;
-        
-        // loop
-        let loopId = 0;
-        processedCode = processedCode.replace(/for\s*\(\s*([^)]+)\s*\)\s*\{/g, (match, count) => {
-            const id = loopId++;
-            return `for (let __r${id} = 0; __r${id} < ${count}; __r${id}++) {`;
-        });
-        
-        // Functions support
-        const customFuncs = [...processedCode.matchAll(/function\s+([a-zA-Z0-9_]+)/g)].map(m => m[1]);
-        processedCode = processedCode.replace(/function\s+([a-zA-Z0-9_]+)\s*\(/g, "async function $1(");
-        customFuncs.forEach(fn => {
-            const callRegex = new RegExp(`\\b${fn}\\s*\\(`, 'g');
-            processedCode = processedCode.replace(callRegex, `await ${fn}(`);
-        });
-        // Cleanup replacements
-        processedCode = processedCode.replace(/async\s+function\s+await\s+/g, "async function ");
-        processedCode = processedCode.replace(/await\s+await\s+/g, "await ");
-        
-        // player
-        processedCode = processedCode.replace(/(player\.(move|run|take|open|push|pull)\(.*\))/g, "await $1");
-        
+        const finalCode = this.processCode(code);
         const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
-        const execute = new AsyncFunction("canMove", processedCode);
-        
-        await execute(window.canMove);
-        
-        if (window.stopExecution) {
-            window.log('Execution stopped.', 'info');
+        const execute = new AsyncFunction("player", "canMove", finalCode);
+
+        await execute(window.player, window.canMove);
+
+        // check results
+        if (State.stopExecution) {
+            Logger.log('Execution halted.', 'info');
         } else {
-            // Check win condition
             if (window.checkWinCondition && window.checkWinCondition()) {
                 window.winLevel();
             } else {
-                window.log('Code finished. But you didn\'t reach the goal!', 'error');
+                Logger.log('Finished. Path missed the goal!', 'error');
             }
         }
     } catch (err) {
         if (err.message === "STOPPED_BY_USER") {
-            window.log('Execution stopped by user.', 'info');
-        } else if (err.message === "CRASHED_INTO_WALL") {
-            window.log('Error: Crash! The player hit a wall!', 'error');
+            Logger.log('Stopped by user.', 'info');
+        } else if (err.message === "CRASHED") {
+           // handled in player.js
         } else {
-            window.log('Execution Error: ' + err.message, 'error');
+            Logger.log('Execution Error: ' + err.message, 'error');
         }
     } finally {
-        window.isRunning = false;
-        window.stopExecution = false;
-        window.RUN_BTN.disabled = false;
-        window.RUN_BTN.innerText = 'Run Code';
-        window.RUN_BTN.classList.remove('btn-danger');
+        State.isRunning = false;
+        State.stopExecution = false;
+        DOM.runBtn.innerText = 'Run Code';
+        DOM.runBtn.classList.remove('btn-danger');
     }
-}
+  }
+};
+
+window.runCode = window.GridX.Engine.run.bind(window.GridX.Engine);
+window.isRunning = window.GridX.State.isRunning; // compatibility
+window.stopExecution = window.GridX.State.stopExecution; // compatibility
